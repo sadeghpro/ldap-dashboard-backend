@@ -1,6 +1,9 @@
 import express from 'express';
 import { SearchEntryObject } from 'ldapjs';
 import client from '../utils/clientLdap';
+import noSessionResponse from '../utils/noSessionResponse';
+import ldap from 'ldapjs';
+
 
 const router = express.Router();
 
@@ -42,11 +45,51 @@ router.post('/', (req, res) => {
                         data,
                     });
                 })
-                
+
             });
 
         }
     });
+})
+
+router.post('/change', (req, res) => {
+    if (req.session.auth) {
+        client.bind(req.session.auth.DN, req.session.auth.password, function (err) {
+            if (err) {
+                noSessionResponse(res);
+            } else {
+                client.modify(req.session.auth!.DN, [
+                    new ldap.Change({
+                        operation: 'replace',
+                        modification: {
+                            userPassword: req.body.password
+                        }
+                    }),
+                ], function (err) {
+                    if (err) {
+                        res.send({ 
+                            status: false,
+                            snackbar: {
+                                type: 'error',
+                                message: 'There is an error. please contact administrator',
+                            }
+                        })
+                    }
+                    else {
+                        res.send({ 
+                            status: true,
+                            snackbar: {
+                                type: 'success',
+                                message: 'Your password changed successfully.'
+                            }
+                        })
+                    }
+                });
+            }
+        });
+    } else {
+        noSessionResponse(res);
+    }
 })
 
 
