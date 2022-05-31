@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post('/', (req, res) => {
-    const DN = req.body.DN
+    const DN: string = req.body.DN
     client.bind(DN, req.body.password, function (err) {
         if (err) {
             res.send({
@@ -17,6 +17,10 @@ router.post('/', (req, res) => {
                 }
             })
         } else {
+            req.session.auth = {
+                password: req.body.password,
+                DN: DN,
+            }
             client.search(`dc=example,dc=org`, {
                 filter: `(objectclass=*)`,
                 scope: 'sub',
