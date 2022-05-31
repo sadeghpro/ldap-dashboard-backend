@@ -37,7 +37,10 @@ router.post('/', (req, res) => {
                     throw error;
                 });
                 result.once('end', function () {
-                    res.send(data);
+                    res.send({
+                        status: true,
+                        data,
+                    });
                 })
                 
             });
