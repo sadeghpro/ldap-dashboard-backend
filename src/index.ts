@@ -4,10 +4,16 @@ import bodyParser from 'body-parser';
 import sessions from 'express-session';
 import IAuthSession from './interfaces/authSession';
 import main from './routes/main';
+import cors from 'cors';
 
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}));
 
 declare module 'express-session' {
     interface SessionData {
