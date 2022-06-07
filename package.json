@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "LDAP_SERVER=ldap://127.0.0.1:1389 LDAP_BASE_DN=dc=example,dc=org nodemon src/index.ts",
     "build": "tsc --project ./"
   },
   "dependencies": {
