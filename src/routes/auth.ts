@@ -86,8 +86,11 @@ router.post('/change', (req, res) => {
                                 message: 'There is an error. please contact administrator',
                             }
                         })
-                    }
-                    else {
+                    } else {
+                        req.session.auth = {
+                            password: req.body.password,
+                            DN: req.session.auth!.DN,
+                        }
                         res.send({ 
                             status: true,
                             snackbar: {
