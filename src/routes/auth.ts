@@ -22,6 +22,7 @@ router.post('/', (req, res) => {
         } else {
             req.session.auth = {
                 password: req.body.password,
+                CN: req.body.CN,
                 DN: DN,
             }
             client.search(process.env.LDAP_BASE_DN ?? 'dc=example,dc=org', {
@@ -90,6 +91,7 @@ router.post('/change', (req, res) => {
                         req.session.auth = {
                             password: req.body.password,
                             DN: req.session.auth!.DN,
+                            CN: req.session.auth!.CN,
                         }
                         res.send({ 
                             status: true,

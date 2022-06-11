@@ -5,6 +5,7 @@ import sessions from 'express-session';
 import IAuthSession from './interfaces/authSession';
 import main from './routes/main';
 import cors from 'cors';
+import profile from './routes/profile';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(sessions({
 //Routes
 app.use('/', main);
 app.use('/auth', auth)
+app.use('/profile', profile);
 
 app.listen(5000, () => {
     console.log('The application is listening on port 5000!');
