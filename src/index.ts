@@ -30,10 +30,19 @@ app.use(sessions({
 }));
 
 
+
 //Routes
-app.use('/', main);
-app.use('/auth', auth)
-app.use('/profile', profile);
+app.use('/v1/', main);
+app.use('/v1/auth', auth)
+app.use('/v1/profile', profile);
+
+
+// react
+app.use(express.static('public'))
+app.get('*', (req, res) => {
+    res.sendFile(__dirname, 'public/index.html');
+})
+
 
 app.listen(5000, () => {
     console.log('The application is listening on port 5000!');
