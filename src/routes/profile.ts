@@ -3,6 +3,7 @@ import { SearchEntryObject } from 'ldapjs';
 import client from '../utils/clientLdap';
 import noSessionResponse from '../utils/noSessionResponse';
 import ldap from 'ldapjs';
+import convertToBinary from '../utils/convertToBinary'
 
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.get('/', (req, res) => {
                 client.search(process.env.LDAP_BASE_DN ?? 'dc=example,dc=org', {
                     filter: `(cn=${req.session.auth?.CN})`,
                     scope: 'sub',
-                    attributes: ['uid', 'dn', 'cn', 'sn', 'objectclass', 'mail', 'mobile', 'photo']
+                    attributes: ['uid', 'dn', 'cn', 'sn', 'objectclass', 'mail', 'mobile', 'jpegPhoto']
                 }, function (error, result) {
                     if (error) {
                         res.send({
@@ -38,6 +39,8 @@ router.get('/', (req, res) => {
                     let data: SearchEntryObject;
                     result.on('searchEntry', function (entry) {
                         data = entry.object;
+                        // @ts-ignore
+                        data.jpegPhoto = Buffer.from(convertToBinary(entry).jpegPhoto).toString('base64');
                     });
                     result.once('error', function (error) {
                         res.send({
@@ -115,5 +118,44 @@ router.post('/', (req, res) => {
     }
 })
 
+router.post('/photo', (req, res) => {
+    if (req.session.auth) {
+        client.bind(req.session.auth.DN, req.session.auth.password, function (err) {
+            if (err) {
+                noSessionResponse(res);
+            } else {
+                client.modify(req.session.auth!.DN, [
+                    new ldap.Change({
+                        operation: 'replace',
+                        modification: {
+                            'jpegPhoto': Buffer.from(req.body.photo, 'base64')
+                        }
+                    })
+                ], function (err) {
+                    if (err) {
+                        res.send({ 
+                            status: false,
+                            snackbar: {
+                                type: 'error',
+                                message: 'There is an error. please contact administrator',
+                            }
+                        })
+                    } else {
+                        res.send({ 
+                            status: true,
+                            snackbar: {
+                                type: 'success',
+                                message: 'Your profile photo changed successfully.'
+                            }
+                        })
+                    }
+                });
+            }
+            
+        });
+    } else {
+        noSessionResponse(res);
+    }
+})
 
 export default router;
