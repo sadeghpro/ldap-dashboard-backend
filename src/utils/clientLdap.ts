@@ -2,7 +2,8 @@ import ldap from 'ldapjs';
 
 
 const client = ldap.createClient({
-  url: [process.env.LDAP_SERVER ?? 'ldap://127.0.0.1:1389']
+  url: [process.env.LDAP_SERVER ?? 'ldap://127.0.0.1:1389'],
+  reconnect: true,
 });
 
 client.on('error', (err) => {
