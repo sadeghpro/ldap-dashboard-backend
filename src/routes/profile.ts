@@ -39,8 +39,10 @@ router.get('/', (req, res) => {
                     let data: SearchEntryObject;
                     result.on('searchEntry', function (entry) {
                         data = entry.object;
-                        // @ts-ignore
-                        data.jpegPhoto = Buffer.from(convertToBinary(entry).jpegPhoto).toString('base64');
+                        if (entry.object.jpegPhoto) {
+                            // @ts-ignore
+                            data.jpegPhoto = Buffer.from(convertToBinary(entry).jpegPhoto).toString('base64');
+                        }
                     });
                     result.once('error', function (error) {
                         res.send({
